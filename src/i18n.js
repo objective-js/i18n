@@ -1,10 +1,25 @@
+/*var Ajv = require('ajv');
+var ajv = new Ajv();
+var validateConfiguration = ajv.compile({
+    "title": "i18n",
+    "type": "object",
+    "properties": {
+        "url": {
+            "type": "string",
+            "format": "uri"
+        }
+    },
+    "required": ["url"]
+});*/
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+
 var i18nHelper = function () {
 
     this.keys = [];
 
     this.translations = {};
 
-    this.lang = null;
+    this.language = null;
 
     this.loadingStatus = 'idle';
 
@@ -12,15 +27,19 @@ var i18nHelper = function () {
 
     this.nsSeparator = '.';
 
+    this._xhr = false;
+
 };
 
-i18nHelper.prototype.init = function (config) {
+i18nHelper.prototype.init = function (config)
+{
     this.config = config;
+    this._xhr = new XMLHttpRequest();
 };
 
-i18nHelper.prototype.import = function (key) {
-    if(this.namespace)
-    {
+i18nHelper.prototype.import = function (key)
+{
+    if (this.namespace) {
         key = this.namespace + this.nsSeparator + key;
     }
 
@@ -29,48 +48,54 @@ i18nHelper.prototype.import = function (key) {
     return this;
 };
 
-i18nHelper.prototype.get = function(key) {
-
-    if(this.loadingStatus === 'idle') {
+i18nHelper.prototype.get = function (key)
+{
+    if (this.loadingStatus === 'idle') {
         this.load();
     }
+
     return this.translations[key];
-
 };
 
-i18nHelper.prototype.setLang = function (lang) {
-    this.lang = lang;
+i18nHelper.prototype.setLanguage = function (language)
+{
+    this.language = language;
 };
 
-i18nHelper.prototype.with = function (namespace) {
+i18nHelper.prototype.with = function (namespace)
+{
     this.namespace = namespace;
 };
 
-i18nHelper.prototype.load = function () {
+i18nHelper.prototype.load = function ()
+{
+    if (this.loadingStatus === 'idle') {
 
-    if(this.loadingStatus === 'idle') {
+       /* if (!validateConfiguration(this.config)) {
+            console.error('Translations loading failed. Bad configuration.');
+            self.loadingStatus = 'unreachable';
+            exit();
+        }*/
 
         this.loadingStatus = 'loading';
 
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', this.config.url);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        this._xhr.open('POST', this.config.url);
+        this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         self = this;
-        xhr.onload = function () {
+        this._xhr.onload = function () {
+            if (self._xhr.status !== 200) {
+                console.error('Translations loading failed. Returned status of ' + self._xhr.status);
+                return 'failed';
+            }
 
-            if (xhr.status === 200) {
-                self.translations = JSON.parse(xhr.responseText);
-                self.loadingStatus = 'loaded';
-            }
-            else {
-                console.error('Translations loading failed.  Returned status of ' + xhr.status);
-                self.loadingStatus = 'failed';
-            }
+            self.translations = JSON.parse(self._xhr.responseText);
+            return 'loaded';
         };
 
-        xhr.send(encodeURI('keys=' + JSON.stringify(this.keys) + '&lang=' + this.lang));
-
+        this.loadingStatus = this._xhr.send(encodeURI('keys=' + JSON.stringify(this.keys) + '&language=' + this.language));
     }
 
 };
+
+module.exports = i18nHelper;

@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ObjectiveJS / i18n demo</title>
-    <script src="/src/i18n.js" type="application/ecmascript"></script>
+    <head>
+        <meta charset="UTF-8">
+        <title>ObjectiveJS / i18n demo</title>
+        <script src="../dist/i18n.js"></script>
 
-    <script type="application/ecmascript">
-        window.onload = function() {
-            console.info('initializing i18n');
-            i18n = new i18nHelper();
-            i18n.init({'url': '/demo/translations.php'});
-            i18n.import('translation.key');
-            i18n.load();
-        }
-    </script>
+        <script>
+            window.onload = function() {
+                console.info('initializing i18n');
+                console.log(i18nHelper);
+                i18n = new i18nHelper();
+                i18n.init({'url': '/demo/translations.php'});
+                i18n.import('translation.key');
+                i18n.load();
+            }
+        </script>
 
-</head>
-
-
-<body>
-<button onclick="alert(i18n.get('translation.key'))">Try me!</button>
-</body>
+    </head>
+    <body>
+        <button onclick="alert(i18n.get('translation.key'))">Try me!</button>
+    </body>
 </html>

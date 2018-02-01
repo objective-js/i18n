@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.6",
+    "webpack": "^3.4.1"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha"
+  },
+  "dependencies": {
+    "ajv": "^5.2.0",
+    "xmlhttprequest": "^1.8.0"
+  }
+}
